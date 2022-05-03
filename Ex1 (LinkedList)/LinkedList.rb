@@ -1,47 +1,95 @@
-class LinkedList
+class EmptyListError < StandardError
+end
 
-    attr_reader :size
+class LinkedList
+  class Node
+    attr_accessor :value, :prev, :next
+    
+    def initialize(value, prev, next_node)
+      @value, @prev, @next = value, prev, next_node
+    end
+  end
   
-    def initialize
-      @size = 0
-      @text = ""
+  attr_reader :size
+  
+  def initialize
+    @size = 0
+  end
+  
+  def empty?
+    @size == 0
+  end
+  
+  def add_head(value)
+    node = Node.new(value, nil , @head)
+    if @head
+      @head.prev = node
+    else
+      @tail = node
+    end
+    @head = node
+    @size += 1
+  end
+  
+  def add_tail(value)
+    node = Node.new(value, @tail , nil)
+    if @tail
+      @tail.next = node
+    else
+      @head = node
+    end
+    @tail = node
+    @size += 1
+  end
+  
+  def remove_head
+    raise EmptyListError unless @head
+    
+    node = @head
+    @head = node.next
+    
+    if @head
+      @head.prev = nil
+    else
+      @tail = nil
     end
     
-    def empty?
-      @size == 0
+    @size -= 1
+    node.value
+  end
+  
+  def remove_tail
+    raise EmptyListError unless @tail
+    
+    node = @tail
+    @tail = node.prev
+    
+    if @tail
+      @tail.next = nil
+    else
+      @head = nil
     end
+    
+    @size -= 1
+    node.value
+  end
 
-    def add_head(value)
-        @text = value + @text
-        @size += 1
+  def head
+    raise EmptyListError unless @head
+    @head.value
+  end
+  
+  def tail
+    raise EmptyListError unless @tail
+    @tail.value
+  end
+  
+  def each
+    cursor = @head
+    while cursor
+      yield cursor.value
+      cursor = cursor.next
     end
-
-    def add_tail(value)
-        @text = @text + value
-        @size += 1
-    end
-
-    def remove_head
-        @text = @text.sub!(/^1/, "")
-        @size -= 1
-    end
-
-    def remove_tail
-        p @text
-        @text = @text.chop
-        @size -= 1
-    end
-
-    def head
-        @text
-    end
-
-    def tail
-        @text[-1..-1]
-    end
-
-    def text
-        @text
-    end
-
+  end
+  
 end
